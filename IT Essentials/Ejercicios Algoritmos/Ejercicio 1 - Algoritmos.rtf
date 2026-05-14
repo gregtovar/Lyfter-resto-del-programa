@@ -1,0 +1,214 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 CourierNewPSMT;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww19340\viewh12980\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \
+\
+\
+EJERCICIOS DE ALGORITMOS - IT ESSETIALS\
+GREG TOVAR - Marzo 4\
+\
+\
+\
+\
+\
+Algoritmo 1\
+=====================\
+\
+YOUTUBE:\
+\
+1. Ubicar la laptop\
+2.Buscar la laptop en el lugar habitual (escritorio, mochila, mesa).\
+     Si no aparece, revisar: mochila, sala, cuarto, carro, cargador/estuche.\
+3.Preparar el equipo\
+4.Colocar la laptop sobre una superficie estable.\
+5.Conectar el cargador si la bater\'eda est\'e1 baja (o por prevenci\'f3n).\
+6.Encender la laptop\
+7. Abrir la tapa.\
+8.Presionar el bot\'f3n de encendido (si no se enciende autom\'e1ticamente).\
+9. Esperar a que cargue el sistema.\
+10. Iniciar sesi\'f3n\
+11. Si aparece pantalla de bloqueo:\
+    Introducir contrase\'f1a / Touch ID.\
+12. Esperar a que cargue el escritorio.\
+13. Conectarse a internet\
+14. Verificar Wi-Fi:\
+15. Si est\'e1 conectado, continuar.\
+       Si no, abrir men\'fa Wi-Fi, elegir red, ingresar clave.\
+16.Abrir un navegador\
+17. Abrir Safari / Chrome / Firefox (clic en el icono).\
+18 Ir a YouTube\
+19. En la barra de direcciones escribir: youtube.com\
+20.Presionar Enter.\
+21. Esperar que cargue YouTube.\
+22. Buscar el video\
+23. Hacer clic en la barra de b\'fasqueda de YouTube.\
+24. Escribir el nombre del video, tema o canal.\
+25. Presionar Enter.\
+26. Seleccionar el video correcto\
+27. Revisar resultados (t\'edtulo, canal, duraci\'f3n).\
+28. Hacer clic en el video deseado.\
+29. Reproducir\
+30. Si no inicia autom\'e1ticamente, presionar el bot\'f3n Play.\
+31. Ajustar volumen:\
+32.Teclas de volumen o control del reproductor.\
+33. resionar el \'edcono de Full screen.\
+34.Optimizar la experiencia (opcional)\
+Subt\'edtulos: bot\'f3n CC.\
+35.Al terminar, cerrar navegador\
+\
+\
+\
+Algoritmo 2\
+=====================\
+\
+\
+ \
+\
+ALGORITMO Rutina_Diaria_de_Greg;\
+\
+//\
+// Trate de hacerlo como un programa tipo psuedo lenguaje\
+//\
+\
+\
+//Declaracion de Variables \
+\
+Variables;\
+  dia_activo = true\
+  nivel_de_energia =80\
+  apetito = 30\
+  nivel_de_stress = 20\
+  hora = 630AM\
+\
+\
+	//\
+	// Levantarse\
+	//\
+    \
+    SI hora = 06:30 ENTONCES\
+      LEVANTARSE()\
+      TOMAR_AGUA()\
+      nivel_de_energia =  nivel_de_energia + 5\
+      ivel_de_stress =  =  nivel_de_stress - 5\
+    FIN_SI\
+\
+\
+    \
+    SI (nivel_de_energia >= 50) Y (hora >= 07:00) Y (hora <= 08:00) ENTONCES\
+      HACER_EJERCICIO(30_min)\
+      nivel_de_energia  =   nivel_de_energia - 20\
+      apetito =   apetito + 25\
+      nivel_de_stress  =   nivel_de_stress - 10\
+    SINO\
+      CAMINAR(10_min)\
+      nivel_de_energia  =   nivel_de_energia - 5\
+      apetito =   apetito+ 10\
+    FIN_SI\
+\
+    \
+    SI hora >= 07:30 Y hora <= 09:00 ENTONCES\
+      BA\'d1ARSE()\
+      VESTIRSE()\
+    FIN_SI\
+\
+	//\
+    // \'97\'97  DESAYUNO\
+	//\
+    SI apetito>= 50 ENTONCES\
+      COMER("desayuno")\
+      apetito =   apetito- 40\
+      nivel_de_energia  =   nivel_de_energia + 10\
+    FIN_SI\
+\
+	//\
+    // \'97\'97\'97 TRABAJO \
+	//\
+    SI hora >= 09:00 Y hora < 17:00 ENTONCES\
+\
+      PARA bloque DESDE 1 HASTA 4 HACER\
+        TRABAJAR(90_min)\
+        nivel_de_stress  =    nivel_de_stress + 10\
+        nivel_de_energia  =   nivel_de_energia - 10\
+        apetito =   apetito + 10\
+\
+		//\
+        // \'97\'97\'97\'97\'97 Descanso  \
+		//\
+        SI nivel_de_energia < 30 O  =  nivel_de_stress > 70 ENTONCES\
+          DESCANSAR(15_min)\
+          RESPIRAR()\
+          nivel_de_energia  =   nivel_de_energia + 10\
+          nivel_de_stress =  nivel_de_stress - 15\
+        SINO\
+          DESCANSAR(5_min)\
+          nivel_de_energia  =   nivel_de_energia + 5\
+        FIN_SI\
+      FIN_PARA\
+\
+\
+      //\
+	  // Almuerzo - Cominda de Medio dia\
+      //\
+      SI (hora >= 12:00 Y hora <= 14:00) Y (apetito>= 50) ENTONCES\
+        COMER("almuerzo")\
+        apetito =   apetito- 50\
+        nivel_de_energia  =   nivel_de_energia + 15\
+       nivel_de_stress  =    =  nivel_de_stress - 5\
+      FIN_SI\
+\
+    FIN_SI\
+\
+\
+    //\
+	// Amigos\
+    //    \
+      SI hora >= 17:30 Y hora <= 20:30 ENTONCES\
+      SI ( =  nivel_de_stress >= 60) O (hoy_es("fin_de_semana") = VERDADERO) ENTONCES\
+        HABLAR_CON_AMIGOS("llamada o chat", 20_min)\
+         nivel_de_stress     =  nivel_de_stress - 20\
+        nivel_de_energia  =   nivel_de_energia + 5\
+      FIN_SI\
+    FIN_SI\
+\
+    // \
+	// CENA\
+	//\
+    SI hora >= 19:00 Y apetito>= 50 ENTONCES\
+      COMER("cena")\
+      apetito =   apetito- 50\
+      nivel_de_energia  =   nivel_de_energia + 10\
+    FIN_SI\
+\
+    // \
+	// RELAX Y VER TV\
+	//\
+\
+    SI hora >= 20:00 Y hora <= 22:30 ENTONCES\
+      episodios  =   0\
+      MIENTRAS episodios < 2 Y nivel_de_energia > 15 HACER\
+        VER_TV(1_episodio)\
+        episodios  =   episodios + 1\
+        nivel_de_energia  =   nivel_de_energia - 10\
+      FIN_MIENTRAS\
+    FIN_SI\
+\
+	//\
+    // Terminar el dia\
+	//\
+\
+    SI hora >= 22:30 O nivel_de_energia <= 10 ENTONCES\
+      PREPARAR_DIA_SIGUIENTE()\
+      APAGAR_PANTALLAS()\
+      DORMIR()\
+      dia_activo  =   false;\
+    FIN_SI\
+\
+  FIN_MIENTRAS\
+\
+FIN\
+\
+}

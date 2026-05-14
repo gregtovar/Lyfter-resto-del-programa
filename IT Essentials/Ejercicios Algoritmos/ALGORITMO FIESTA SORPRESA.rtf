@@ -1,0 +1,266 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;\red94\green176\blue32;\red255\green255\blue255;\red94\green176\blue32;
+\red255\green255\blue255;\red255\green255\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c43067\c72927\c16222;\cssrgb\c100000\c100000\c99971;\cssrgb\c43067\c72927\c16222;
+\cssrgb\c100000\c100000\c99971;\cssrgb\c100000\c100000\c100000;}
+\margl1440\margr1440\vieww32560\viewh17380\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs36 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec3 //\
+//\cf4 \outl0\strokewidth0  ALGORITMO FIESTA SORPRESA\cf2 \outl0\strokewidth0 \strokec3 \
+//\
+//\
+\
+\
+INICIO\
+\
+DECLARACION DE VARIABLES \
+\
+amigoEnCasa BOOLEAN;\
+invitadosLlegaron BOOLEAN;\
+contadorInvitados = 0;\
+totalInvitados = tama\'f1o(listaInvitados);\
+\
+ComprarDecoracion();\
+ComprarComida();\
+DecorarLugar();\
+\
+SI amigoEnCasa == TRUE ENTONCES\
+     PedirAmigoQueSalga()\
+     MIENTRAS amigoEnCasa == TRUE HACER\
+         Esperar()\
+         VerificarSiSigueEnCasa()\
+     FINMIENTRAS\
+FIN SI\
+\
+EnviarMensaje(listaInvitados, "Lleguen a la hora indicada y en silencio\'94);\
+\
+\
+MIENTRAS contadorInvitados < totalInvitados HACER\
+	SI LlegaInvitado() == TRUE ENTONCES\
+		contadorInvitados = contadorInvitados + 1;\
+		MostrarLugarParaRegalos()\
+		PedirSilencio()\
+	SINO\
+		ConversarBajo();;\
+		PrepararComida();\
+		RevisarSiAmigoSeAcerca();\
+	FIN SI\
+FINMIENTRAS\
+\
+ApagarLuces();\
+TodosSeEsconden();\
+\
+MIENTRAS AmigoNoHaEntrado() HACER\
+	Esperar();\
+FINMIENTRAS\
+\
+Gritar("SORPRESA!!!!!!!!\'94);\
+\
+EncenderMusica();\
+ServirComida();\
+CantarCumpleanos();\
+AbrirRegalos();\
+\
+MIENTRAS InvitadosEnFiesta() == TRUE HACER\
+	Bailar();\
+	TomarFotos();\
+	Conversar();\
+FINMIENTRAS\
+\
+LimpiarLugar();\
+AgradecerInvitados();\
+\
+FIN\
+\
+\
+\
+//\
+//\
+//Algoritmo: Prepararse para un examen importante \
+//\
+//\
+//\
+\
+INICIO\
+\
+VARIABLES\
+\
+temaActual;\
+dudas = FALSE\
+entendio = FALSE\
+listo = FALSE\
+listaTemas = [Tema1, Tema2, ...]\
+\
+//\
+// Preparaci\'f3n inicial:\
+// Organizar material (apuntes, libro, PDFs, ejercicios).\
+//\
+\
+Crear un horario (bloques de estudio + descansos).\
+Elegir un lugar sin distracciones.\
+Para cada tema en listaTemas hacer:\
+Leer el tema (visi\'f3n general).\
+Estudiar (subrayar, hacer resumen, mapas, tarjetas).\
+Repasar lo estudiado (explicar en voz alta o \'93como si ense\'f1aras\'94).\
+Practicar (ejercicios, preguntas, ex\'e1menes anteriores).\
+Verificaci\'f3n de comprensi\'f3n (condiciones):\
+\
+SI puedes responder preguntas clave del tema sin mirar apuntes ENTONCES\
+     entendio = TRUE\
+SINO\
+   entendio = FALSE\
+FIN DEL SI\
+\
+//\
+//Manejo de dudas:\
+//\
+\
+SI entendi\'f3 == FALSE ENTONCES\
+	dudas = TRUE\
+	Identificar exactamente qu\'e9 parte confunde (definici\'f3n, f\'f3rmula, concepto, paso).\
+	Releer esa secci\'f3n y buscar otra explicaci\'f3n (video, tutor, ejemplos).\
+	Hacer 5\'9610 ejercicios adicionales del punto d\'e9bil.\
+SI NO\
+	dudas = FALSE\
+	Ciclo de mejora hasta dominar el tema:\
+\pard\pardeftab720\partightenfactor0
+\cf4 \outl0\strokewidth0 FIN DEL SI\
+\cf2 \outl0\strokewidth0 \strokec3 \
+\pard\pardeftab720\partightenfactor0
+\cf2 MIENTRAS entendio == FALSE HACER\
+	Releer / reestudiar el fragmento dif\'edcil.\
+	Repasar con t\'e9cnica activa (explicar, tarjetas, preguntas).\
+	Practicar nuevamente (ejercicios similares).\
+	Volver a evaluar:\
+	SI ahora respondes bien y con seguridad\
+		 entendio = TRUE y dudas = FALSE\
+	SINO\
+	       mantener entendio = FALSE y repetir el ciclo\
+	FIN DEL SI\
+FIN MIENTRAS\
+\
+Evaluaci\'f3n general (simulacro):\
+Hacer un mini-examen o simulacro cronometrado.\
+Revisar errores y clasificarlos (concepto vs. descuido vs. tiempo).\
+//\
+//Ciclo final hasta sentirse listo:\
+//\
+MIENTRAS listo == FALSE HACER\
+	Repasar temas con m\'e1s errores.\
+	Practicar preguntas tipo examen.\
+	Hacer otro simulacro corto.\
+\
+	//\
+	//Decidir si est\'e1s listo:\
+	//\
+	//\
+\
+	SI el puntaje objetivo se cumple y los errores bajan y te sientes seguro\
+		listo = TRUE\
+	SINO\
+		listo = FALSE (seguir reforzando)\
+	FIN DEL SI\
+FIN MIENTRAS\
+\
+\
+Cierre antes del examen:\
+Repaso ligero (res\'famenes / tarjetas).\
+Preparar mochila/material.\
+Dormir bien.\
+FIN\
+\
+\
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf4 \outl0\strokewidth0 //\
+// Algoritmo: Prepararse para ir a tu viaje de diversi\'f3n favorito (paso a paso)\
+//\
+ \
+INICIO\
+\
+Definir destinoFavorito y fechasViaje.\
+Definir presupuesto (transporte + hospedaje + comidas + actividades + extras).\
+Elegir con qui\'e9n viajas (solo, amigos, familia).\
+///\
+/Reservas principales:\
+//\
+Comprar/confirmar boletos (avi\'f3n, tren, carro).\
+Reservar hospedaje (hotel/Airbnb).\
+Guardar confirmaciones en el tel\'e9fono y/o correo.\
+//\
+//Plan de diversi\'f3n:\
+//\
+Hacer lista de actividades: playas, conciertos, tours, restaurantes, deportes, etc.\
+Priorizar: \'93imperdibles\'94 vs. \'93opcional\'94.\
+Reservar entradas si aplica (museos, shows, tours).\
+//\
+//Documentos y requisitos:\
+//\
+Verificar identificaci\'f3n/pasaporte vigente.\
+Revisar si necesitas visa, seguro de viaje o permisos.\
+Guardar copias digitales (foto o PDF).\
+\
+//\
+//Organizaci\'f3n del tiempo:\
+//\
+Pedir d\'edas libres o confirmar horario.\
+Avisar a quien corresponda (familia, trabajo, etc.).\
+Preparar un plan para pendientes (pagos, mascotas, plantas, correo).\
+\
+//\
+// Lista de equipaje:\
+//\
+Ropa seg\'fan clima y actividades.\
+Zapatos adecuados (caminar, playa, salir de noche).\
+Higiene personal y medicamentos.\
+Cargadores, aud\'edfonos, power bank.\
+Extras de diversi\'f3n (lentes de sol, traje de ba\'f1o, c\'e1mara, etc.).\
+\
+//\
+//Empacar (con control):\
+//\
+Colocar lo esencial primero (documentos, dinero/tarjetas, llaves).\
+Empacar ropa por conjuntos.\
+Revisar l\'edmite de maleta/peso (si aplica).\
+\
+//\
+//Revisi\'f3n final (d\'eda antes):\
+//\
+Confirmar transporte y horarios.\
+Revisar clima del destino.\
+Cargar tel\'e9fono y dispositivos.\
+Dormir bien.\
+\
+//\
+//D\'eda del viaje:\
+//\
+Desayunar/hidratarse.\
+Salir con tiempo extra.\
+Llegar a terminal/aeropuerto o iniciar ruta.\
+Check-in / abordar / arrancar.\
+\
+//\
+//Inicio oficial de la diversi\'f3n:\
+//\
+Llegar al destino.\
+Hacer check-in.\
+Guardar maletas.\
+Ir a la primera actividad \'93imperdible\'94.\
+\
+\
+FIN\
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \outl0\strokewidth0 \strokec3 \
+\
+\
+
+\fs24 \cf6 \strokec6 \
+//\
+}
