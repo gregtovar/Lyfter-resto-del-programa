@@ -1,0 +1,176 @@
+# ── Colors ─────────────────────────────────────────────
+def colors():
+    return {
+        "CYAN":   "\033[96m",
+        "BLUE":   "\033[94m",
+        "GREEN":  "\033[92m",
+        "YELLOW": "\033[93m",
+        "RED":    "\033[91m",
+        "PURPLE": "\033[95m",
+        "BOLD":   "\033[1m",
+        "DIM":    "\033[2m",
+        "RESET":  "\033[0m",
+    }
+
+
+# ══════════════════════════════════════════════════════
+#  Body Part Classes
+# ══════════════════════════════════════════════════════
+
+class Hand:
+    def __init__(self, side: str):
+        self.side    = side        # "right" or "left"
+        self.fingers = 5
+
+    def __str__(self):
+        return f"{self.side.capitalize()} Hand ({self.fingers} fingers)"
+
+
+class Arm:
+    def __init__(self, side: str):
+        self.side = side
+        self.hand = Hand(side)
+
+    def __str__(self):
+        return f"{self.side.capitalize()} Arm → {self.hand}"
+
+
+class Feet:
+    def __init__(self, side: str):
+        self.side = side
+        self.toes = 5
+
+    def __str__(self):
+        return f"{self.side.capitalize()} Foot ({self.toes} toes)"
+
+
+class Leg:
+    def __init__(self, side: str):
+        self.side = side
+        self.feet = Feet(side)
+
+    def __str__(self):
+        return f"{self.side.capitalize()} Leg → {self.feet}"
+
+
+class Head:
+    def __init__(self):
+        self.eyes = 2
+        self.ears = 2
+        self.nose = 1
+        self.mouth = 1
+
+    def __str__(self):
+        return (f"Head (eyes: {self.eyes}, ears: {self.ears}, "
+                f"nose: {self.nose}, mouth: {self.mouth})")
+
+
+class Torso:
+    def __init__(self, head: Head, right_arm: Arm, left_arm: Arm):
+        self.head      = head
+        self.right_arm = right_arm
+        self.left_arm  = left_arm
+
+    def __str__(self):
+        return (f"Torso → {self.head} | "
+                f"{self.right_arm} | {self.left_arm}")
+
+
+class Human:
+    def __init__(self, name: str):
+        self.name = name
+
+        # Build body parts bottom-up
+        right_arm  = Arm("right")
+        left_arm   = Arm("left")
+        head       = Head()
+
+        self.torso     = Torso(head, right_arm, left_arm)
+        self.right_leg = Leg("right")
+        self.left_leg  = Leg("left")
+
+    # ── Shortcuts for clean access ─────────────────────
+    @property
+    def head(self):
+        return self.torso.head
+
+    @property
+    def right_arm(self):
+        return self.torso.right_arm
+
+    @property
+    def left_arm(self):
+        return self.torso.left_arm
+
+    @property
+    def right_hand(self):
+        return self.torso.right_arm.hand
+
+    @property
+    def left_hand(self):
+        return self.torso.left_arm.hand
+
+    @property
+    def right_foot(self):
+        return self.right_leg.feet
+
+    @property
+    def left_foot(self):
+        return self.left_leg.feet
+
+
+# ══════════════════════════════════════════════════════
+#  Display
+# ══════════════════════════════════════════════════════
+
+def print_human(human: Human) -> None:
+    c = colors()
+    bar = "─" * 46
+
+    print(f"\n  {c['BLUE']}{bar}{c['RESET']}")
+    print(f"  {c['BOLD']}{c['PURPLE']}  🧍  {human.name}{c['RESET']}")
+    print(f"  {c['BLUE']}{bar}{c['RESET']}")
+
+    sections = [
+        ("🧠  Head",        human.head),
+        ("🫀  Torso",       "connects head, arms, and upper body"),
+        ("💪  Right Arm",   human.right_arm),
+        ("💪  Left Arm",    human.left_arm),
+        ("🖐  Right Hand",  human.right_hand),
+        ("🖐  Left Hand",   human.left_hand),
+        ("🦵  Right Leg",   human.right_leg),
+        ("🦵  Left Leg",    human.left_leg),
+        ("🦶  Right Foot",  human.right_foot),
+        ("🦶  Left Foot",   human.left_foot),
+    ]
+
+    for label, part in sections:
+        print(f"  {c['CYAN']}{c['BOLD']}  {label}{c['RESET']}")
+        print(f"  {c['DIM']}    └─ {part}{c['RESET']}")
+
+    print(f"  {c['BLUE']}{bar}{c['RESET']}\n")
+
+
+# ══════════════════════════════════════════════════════
+#  Main Program
+# ══════════════════════════════════════════════════════
+
+c = colors()
+
+print(f"\n  {c['BOLD']}{c['PURPLE']}✦  Human Body Structure  ✦{c['RESET']}")
+
+name  = input(f"\n  {c['YELLOW']}👤  Enter a name » {c['RESET']}").strip() or "Alex"
+human = Human(name)
+
+print_human(human)
+
+# Show how attribute access works
+print(f"  {c['DIM']}  Attribute access examples:{c['RESET']}")
+print(f"  {c['GREEN']}  human.name               →  {c['RESET']}{human.name}")
+print(f"  {c['GREEN']}  human.head               →  {c['RESET']}{human.head}")
+print(f"  {c['GREEN']}  human.right_arm          →  {c['RESET']}{human.right_arm}")
+print(f"  {c['GREEN']}  human.right_arm.hand     →  {c['RESET']}{human.right_arm.hand}")
+print(f"  {c['GREEN']}  human.right_leg.feet     →  {c['RESET']}{human.right_leg.feet}")
+print(f"  {c['GREEN']}  human.head.eyes          →  {c['RESET']}{human.head.eyes}")
+print(f"  {c['GREEN']}  human.right_hand.fingers →  {c['RESET']}{human.right_hand.fingers}")
+print()
