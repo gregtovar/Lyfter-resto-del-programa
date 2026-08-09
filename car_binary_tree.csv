@@ -1,0 +1,32 @@
+Node ID,Value,Parent ID,Branch,Path
+N01,Cars,,,Cars
+N02,Toyota,N01,Left,Cars > Toyota
+N03,Honda,N01,Right,Cars > Honda
+N04,Corolla,N02,Left,Cars > Toyota > Corolla
+N05,RAV4,N02,Right,Cars > Toyota > RAV4
+N06,Civic,N03,Left,Cars > Honda > Civic
+N07,CR-V,N03,Right,Cars > Honda > CR-V
+N08,LE,N04,Left,Cars > Toyota > Corolla > LE
+N09,XSE,N04,Right,Cars > Toyota > Corolla > XSE
+N10,XLE,N05,Left,Cars > Toyota > RAV4 > XLE
+N11,Limited,N05,Right,Cars > Toyota > RAV4 > Limited
+N12,Sport,N06,Left,Cars > Honda > Civic > Sport
+N13,Touring,N06,Right,Cars > Honda > Civic > Touring
+N14,EX,N07,Left,Cars > Honda > CR-V > EX
+N15,Sport Touring,N07,Right,Cars > Honda > CR-V > Sport Touring
+N16,Gasoline,N08,Left,Cars > Toyota > Corolla > LE > Gasoline
+N17,Hybrid,N08,Right,Cars > Toyota > Corolla > LE > Hybrid
+N18,Gasoline,N09,Left,Cars > Toyota > Corolla > XSE > Gasoline
+N19,Hybrid,N09,Right,Cars > Toyota > Corolla > XSE > Hybrid
+N20,Gasoline,N10,Left,Cars > Toyota > RAV4 > XLE > Gasoline
+N21,Hybrid,N10,Right,Cars > Toyota > RAV4 > XLE > Hybrid
+N22,Gasoline,N11,Left,Cars > Toyota > RAV4 > Limited > Gasoline
+N23,Hybrid,N11,Right,Cars > Toyota > RAV4 > Limited > Hybrid
+N24,Sedan,N12,Left,Cars > Honda > Civic > Sport > Sedan
+N25,Hatchback,N12,Right,Cars > Honda > Civic > Sport > Hatchback
+N26,Sedan,N13,Left,Cars > Honda > Civic > Touring > Sedan
+N27,Hatchback,N13,Right,Cars > Honda > Civic > Touring > Hatchback
+N28,FWD,N14,Left,Cars > Honda > CR-V > EX > FWD
+N29,AWD,N14,Right,Cars > Honda > CR-V > EX > AWD
+N30,FWD,N15,Left,Cars > Honda > CR-V > Sport Touring > FWD
+N31,AWD,N15,Right,Cars > Honda > CR-V > Sport Touring > AWD
