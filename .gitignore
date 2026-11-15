@@ -1,0 +1,11 @@
+# Python-generated files
+__pycache__/
+*.py[cod]
+
+# Local data exports and backups
+transactions_Nov11.csv
+transaction_backup.csv
+project_Python_Tables.xlsx
+
+# macOS files
+.DS_Store
