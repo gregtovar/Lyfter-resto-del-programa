@@ -301,6 +301,7 @@ class ConsoleUI:
 
         self._print_categories()
         category_id = input("Category ID: ").strip()
+        title = input("Title: ").strip()
         amount = input("Amount: ").strip()
 
         now = datetime.now()
@@ -310,7 +311,7 @@ class ConsoleUI:
         try:
             timestamp = self.finance_manager.combine_date_time(date_str, time_str)
             transaction = self.finance_manager.add_transaction(
-                type_id=type_id, category_id=category_id, amount=amount, timestamp=timestamp
+                type_id=type_id, category_id=category_id, amount=amount, title=title, timestamp=timestamp
             )
             print(f"Transaction {transaction.transaction_id} saved: {transaction.amount}")
         except FinanceManagerError as error:
@@ -330,11 +331,12 @@ class ConsoleUI:
             print(f"Error: {error}")
             return
 
-        print(f"Current category: {transaction.category_id}, "
+        print(f"Current title: {transaction.title}, category: {transaction.category_id}, "
               f"amount: {transaction.amount}, type: {transaction.type_id}")
         print("Leave a field blank to keep its current value.")
 
         category_id = input("New category ID: ").strip() or None
+        title = input("New title: ").strip() or None
         amount = input("New amount: ").strip() or None
         self._print_types()
         type_id = input("New Type ID: ").strip() or None
@@ -351,7 +353,7 @@ class ConsoleUI:
                 )
             updated = self.finance_manager.edit_transaction(
                 transaction_id, category_id=category_id, amount=amount, type_id=type_id,
-                timestamp=timestamp,
+                title=title, timestamp=timestamp,
             )
             print(f"Transaction {updated.transaction_id} updated: {updated.amount}")
         except FinanceManagerError as error:
@@ -389,7 +391,7 @@ class ConsoleUI:
         if not transactions:
             print("(No transactions yet.)")
             return
-        print(f"{'ID':<10}{'TimeStamp':<21}{'Category':<15}{'Type':<14}{'Amount':>10}")
+        print(f"{'ID':<10}{'TimeStamp':<21}{'Title':<25}{'Category':<15}{'Type':<14}{'Amount':>10}")
         for transaction in transactions:
             try:
                 category_name = self.finance_manager.get_category_by_id(transaction.category_id).name
@@ -399,8 +401,10 @@ class ConsoleUI:
                 type_name = self.finance_manager.get_type_name(transaction.type_id)
             except FinanceManagerError:
                 type_name = "(deleted)"
+            title = transaction.title
+            display_title = title if len(title) <= 22 else title[:21] + "…"
             print(f"{transaction.transaction_id:<10}{transaction.timestamp:<21}"
-                  f"{category_name:<15}{type_name:<14}{transaction.amount:>10}")
+                  f"{display_title:<25}{category_name:<15}{type_name:<14}{transaction.amount:>10}")
 
     # ------------------------------------------------------------------ #
     # Dashboard

@@ -7,9 +7,9 @@ from core.finance_manager import FinanceManager
 CATEGORIES_CSV = "ID,Category\n1,Meal\n2,Transportation\n"
 TYPES_CSV = "ID,Type\n1,Income\n2,Expense\n3,Adjustment\n"
 TRANSACTIONS_CSV = (
-    "ID,TimeStamp,Category,Amount,Type\n"
-    "10000001,2026-01-01 08:00:00,1,-19.85,2\n"
-    "10000002,2026-01-02 09:00:00,2,500.00,1\n"
+    "ID,TimeStamp,Title,Category,Amount,Type\n"
+    "10000001,2026-01-01 08:00:00,Dry Cleaning,1,-19.85,2\n"
+    "10000002,2026-01-02 09:00:00,Payroll Deposit,2,500.00,1\n"
 )
 
 

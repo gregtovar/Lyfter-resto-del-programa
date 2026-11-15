@@ -457,9 +457,9 @@ class GUIUI:
                       enable_events=True, readonly=True, font=FONT,
                       background_color=BG_WHITE, text_color=TEXT_DARK, size=(16, 1))],
             [sg.Table(
-                values=[], headings=["ID", "TimeStamp", "Category", "Type", "Amount"],
+                values=[], headings=["ID", "TimeStamp", "Title", "Category", "Type", "Amount"],
                 key="-TABLE-", enable_events=True, auto_size_columns=False,
-                col_widths=[10, 19, 16, 11, 11], justification="left", num_rows=18,
+                col_widths=[10, 19, 20, 16, 11, 11], justification="left", num_rows=18,
                 select_mode=sg.TABLE_SELECT_MODE_BROWSE, font=FONT, header_font=FONT_BOLD,
                 expand_x=True, expand_y=True, background_color=BG_WHITE,
                 alternating_row_color="#f0f3f7", text_color=TEXT_DARK,
@@ -571,8 +571,13 @@ class GUIUI:
         previous_category = window["-CATEGORY-FILTER-"].get() or "All"
         previous_type = window["-TYPE-FILTER-"].get() or "All"
 
-        category_options = ["All"] + [c.name for c in self.finance_manager.get_categories()]
-        type_options = ["All"] + [t["name"] for t in self.finance_manager.get_types()]
+        categories = self.finance_manager.get_categories()
+        types = self.finance_manager.get_types()
+        category_id_by_name = {c.name: c.category_id for c in categories}
+        type_id_by_name = {t["name"]: t["id"] for t in types}
+
+        category_options = ["All"] + [c.name for c in categories]
+        type_options = ["All"] + [t["name"] for t in types]
 
         category_filter = previous_category if previous_category in category_options else "All"
         type_filter = previous_type if previous_type in type_options else "All"
@@ -580,9 +585,14 @@ class GUIUI:
         window["-CATEGORY-FILTER-"].update(values=category_options, value=category_filter)
         window["-TYPE-FILTER-"].update(values=type_options, value=type_filter)
 
+        category_id = category_id_by_name.get(category_filter) if category_filter != "All" else None
+        type_id = type_id_by_name.get(type_filter) if type_filter != "All" else None
+
         rows = []
         self._table_transaction_ids = []
-        for transaction in self.finance_manager.get_transactions(start=start, end=end):
+        for transaction in self.finance_manager.get_transactions(
+            start=start, end=end, category_id=category_id, type_id=type_id
+        ):
             try:
                 category_name = self.finance_manager.get_category_by_id(transaction.category_id).name
             except FinanceManagerError:
@@ -592,12 +602,7 @@ class GUIUI:
             except FinanceManagerError:
                 type_name = "(deleted)"
 
-            if category_filter not in ("All", "", None) and category_name != category_filter:
-                continue
-            if type_filter not in ("All", "", None) and type_name != type_filter:
-                continue
-
-            rows.append([transaction.transaction_id, transaction.timestamp,
+            rows.append([transaction.transaction_id, transaction.timestamp, transaction.title,
                          category_name, type_name, str(transaction.amount)])
             self._table_transaction_ids.append(transaction.transaction_id)
 
@@ -926,6 +931,7 @@ class GUIUI:
         if editing:
             default_type = type_name_by_id.get(transaction.type_id, type_names[0])
             default_category = category_by_id.get(transaction.category_id, category_names[0])
+            default_title = transaction.title
             default_amount = str(abs(transaction.amount))
             existing_timestamp = datetime.strptime(transaction.timestamp, "%Y-%m-%d %H:%M:%S")
             default_date = existing_timestamp.strftime("%Y-%m-%d")
@@ -934,6 +940,7 @@ class GUIUI:
             preset_match = next((n for n in type_names if n.lower() == (preset_type_name or "").lower()), None)
             default_type = preset_match or type_names[0]
             default_category = category_names[0]
+            default_title = ""
             default_amount = ""
             default_date = now.strftime("%Y-%m-%d")
             default_time = now.strftime("%H:%M:%S")
@@ -950,6 +957,8 @@ class GUIUI:
         layout = [
             [sg.Text("Edit Transaction" if editing else "Add Transaction", font=tx_font_bold,
                       pad=((5, 5), (15, 25)))],
+            [sg.Text("Title:", size=label_size, font=tx_font, pad=label_pad),
+             sg.Input(default_title, key="-TITLE-", font=tx_font, size=input_size, pad=input_pad)],
             [sg.Text("Type:", size=label_size, font=tx_font, pad=label_pad),
              sg.Combo(type_names, default_value=default_type, key="-TYPE-",
                       readonly=True, font=tx_font, size=input_size, pad=input_pad)],
@@ -983,12 +992,13 @@ class GUIUI:
                     if editing:
                         self.finance_manager.edit_transaction(
                             transaction_id, category_id=category_id,
-                            amount=values["-AMOUNT-"], type_id=type_id, timestamp=timestamp,
+                            amount=values["-AMOUNT-"], type_id=type_id, title=values["-TITLE-"],
+                            timestamp=timestamp,
                         )
                     else:
                         self.finance_manager.add_transaction(
                             type_id=type_id, category_id=category_id, amount=values["-AMOUNT-"],
-                            timestamp=timestamp,
+                            title=values["-TITLE-"], timestamp=timestamp,
                         )
                     break
                 except FinanceManagerError as error:

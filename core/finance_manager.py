@@ -180,14 +180,16 @@ class FinanceManager:
     # ------------------------------------------------------------------ #
 
 
-    def get_transactions(self, start=None, end=None) -> list:
+    def get_transactions(self, start=None, end=None, category_id=None, type_id=None) -> list:
         """
         Return transactions, most recent first.
 
         `start`/`end` are optional inclusive datetime bounds used to restrict
         the result to a time period (see `last_n_days_bounds`/`parse_date_range`).
+        `category_id`/`type_id` optionally restrict the result to a single
+        category/type, same as `dashboard_summary`/`category_totals_abs`.
         """
-        transactions = self._filter_transactions(start, end)
+        transactions = self._filter_transactions(start, end, category_id, type_id)
         return sorted(transactions, key=lambda t: t.timestamp, reverse=True)
 
     def get_transaction_by_id(self, transaction_id) -> Transaction:
@@ -224,7 +226,7 @@ class FinanceManager:
     """
 
 
-    def add_transaction(self, type_id, category_id, amount, timestamp=None) -> Transaction:
+    def add_transaction(self, type_id, category_id, amount, title, timestamp=None) -> Transaction:
 
         if not self.categories:
             raise NotFoundError(
@@ -241,9 +243,12 @@ class FinanceManager:
         raw_amount = Validator.validate_amount(amount)
         signed_amount = Validator.apply_sign_rules(raw_amount, type_id)
 
+        clean_title = Validator.validate_title(title)
+
         transaction = Transaction(
             transaction_id=self._next_transaction_id(),
             timestamp=timestamp or datetime.now().strftime(TIMESTAMP_FORMAT),
+            title=clean_title,
             category_id=category_id,
             amount=signed_amount,
             type_id=type_id,
@@ -269,7 +274,7 @@ class FinanceManager:
 
 
     def edit_transaction(self, transaction_id, category_id=None, amount=None, type_id=None,
-                          timestamp=None) -> Transaction:
+                          title=None, timestamp=None) -> Transaction:
 
         transaction = self.get_transaction_by_id(transaction_id)
 
@@ -282,6 +287,8 @@ class FinanceManager:
         if category_id is not None:
             valid_category_ids = [c.category_id for c in self.categories]
             new_category_id = Validator.validate_category_id(category_id, valid_category_ids)
+
+        new_title = transaction.title if title is None else Validator.validate_title(title)
 
         #
         # NOTE--------
@@ -301,6 +308,7 @@ class FinanceManager:
         transaction.category_id = new_category_id
         transaction.type_id = new_type_id
         transaction.amount = new_amount
+        transaction.title = new_title
         if timestamp is not None:
             transaction.timestamp = timestamp
 
@@ -341,15 +349,31 @@ class FinanceManager:
         """
         Replace transactions.csv with the contents of `source_path`.
 
-        The current transactions.csv is first backed up to
-        transaction_backup.csv, then the new file is validated by loading it
-        (raising FileOperationError if malformed) before it replaces the
-        live data and in-memory transaction list. Returns the backup path.
+        The new file is validated before anything is overwritten: loading it
+        checks each row's ID, timestamp and amount (raising FileOperationError
+        if malformed), and every row's category/type must reference an
+        existing category/type (raising ValidationError otherwise). Only then
+        is the current transactions.csv backed up to transaction_backup.csv
+        and replaced. Returns the backup path.
         """
         if not os.path.isfile(source_path):
             raise FileOperationError(f"File not found: {source_path}")
 
         new_transactions = self.file_manager.load_transactions_from(source_path)
+
+        valid_category_ids = {c.category_id for c in self.categories}
+        valid_type_ids = {t["id"] for t in self.types}
+        for transaction in new_transactions:
+            if transaction.category_id not in valid_category_ids:
+                raise ValidationError(
+                    f"Transaction ID {transaction.transaction_id} references unknown "
+                    f"category ID {transaction.category_id}."
+                )
+            if transaction.type_id not in valid_type_ids:
+                raise ValidationError(
+                    f"Transaction ID {transaction.transaction_id} references unknown "
+                    f"type ID {transaction.type_id}."
+                )
 
         backup_path = self.file_manager.backup_transactions(self.transactions)
         self.transactions = new_transactions
@@ -383,8 +407,9 @@ class FinanceManager:
     @staticmethod
     def combine_date_time(date_str: str, time_str: str) -> str:
         """Validate a 'YYYY-MM-DD' date and 'HH:MM[:SS]' time and combine them
-        into a single "%Y-%m-%d %H:%M:%S" timestamp string."""
-        parsed_date = Validator.validate_date(date_str)
+        into a single "%Y-%m-%d %H:%M:%S" timestamp string. Transaction dates
+        cannot be in the future."""
+        parsed_date = Validator.validate_date(date_str, allow_future=False)
         parsed_time = Validator.validate_time(time_str)
         return datetime.combine(parsed_date, parsed_time).strftime(TIMESTAMP_FORMAT)
 

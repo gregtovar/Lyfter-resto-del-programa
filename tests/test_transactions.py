@@ -11,33 +11,67 @@ from core.validators import TYPE_INCOME, TYPE_EXPENSE, TYPE_ADJUSTMENT
 
 
 def test_add_transaction_generates_8_digit_id(finance_manager):
-    transaction = finance_manager.add_transaction(type_id=TYPE_INCOME, category_id=1, amount="100.00")
+    transaction = finance_manager.add_transaction(
+        type_id=TYPE_INCOME, category_id=1, amount="100.00", title="Payroll Deposit"
+    )
     assert 10_000_000 <= transaction.transaction_id <= 99_999_999
 
 
 def test_add_income_transaction_is_always_positive(finance_manager):
-    transaction = finance_manager.add_transaction(type_id=TYPE_INCOME, category_id=1, amount="-50.00")
+    transaction = finance_manager.add_transaction(
+        type_id=TYPE_INCOME, category_id=1, amount="-50.00", title="Refund Received"
+    )
     assert transaction.amount == Decimal("50.00")
 
 
 def test_add_expense_transaction_is_always_negative(finance_manager):
-    transaction = finance_manager.add_transaction(type_id=TYPE_EXPENSE, category_id=1, amount="50.00")
+    transaction = finance_manager.add_transaction(
+        type_id=TYPE_EXPENSE, category_id=1, amount="50.00", title="Team Lunch"
+    )
     assert transaction.amount == Decimal("-50.00")
 
 
 def test_add_adjustment_transaction_rejects_zero(finance_manager):
     with pytest.raises(ValidationError):
-        finance_manager.add_transaction(type_id=TYPE_ADJUSTMENT, category_id=1, amount="0")
+        finance_manager.add_transaction(
+            type_id=TYPE_ADJUSTMENT, category_id=1, amount="0", title="Balance Correction"
+        )
 
 
 def test_add_transaction_rejects_unknown_category(finance_manager):
     with pytest.raises(ValidationError):
-        finance_manager.add_transaction(type_id=TYPE_EXPENSE, category_id=999, amount="10.00")
+        finance_manager.add_transaction(
+            type_id=TYPE_EXPENSE, category_id=999, amount="10.00", title="Supermarket"
+        )
 
 
 def test_add_transaction_rejects_non_numeric_amount(finance_manager):
     with pytest.raises(ValidationError):
-        finance_manager.add_transaction(type_id=TYPE_EXPENSE, category_id=1, amount="abc")
+        finance_manager.add_transaction(
+            type_id=TYPE_EXPENSE, category_id=1, amount="abc", title="Supermarket"
+        )
+
+
+@pytest.mark.parametrize("raw_amount", ["Infinity", "-Infinity", "NaN", "1e30"])
+def test_add_transaction_rejects_non_finite_or_overflowing_amount(finance_manager, raw_amount):
+    with pytest.raises(ValidationError):
+        finance_manager.add_transaction(
+            type_id=TYPE_EXPENSE, category_id=1, amount=raw_amount, title="Supermarket"
+        )
+
+
+def test_add_transaction_rejects_empty_title(finance_manager):
+    with pytest.raises(ValidationError):
+        finance_manager.add_transaction(
+            type_id=TYPE_EXPENSE, category_id=1, amount="10.00", title="   "
+        )
+
+
+def test_add_transaction_rejects_title_over_max_length(finance_manager):
+    with pytest.raises(ValidationError):
+        finance_manager.add_transaction(
+            type_id=TYPE_EXPENSE, category_id=1, amount="10.00", title="x" * 256
+        )
 
 
 def test_edit_transaction_preserves_id_and_timestamp(finance_manager):
@@ -68,11 +102,11 @@ def test_no_categories_blocks_transaction_creation(tmp_path):
 
     (tmp_path / "categories.csv").write_text("ID,Category\n", encoding="utf-8")
     (tmp_path / "types.csv").write_text("ID,Type\n1,Income\n2,Expense\n3,Adjustment\n", encoding="utf-8")
-    (tmp_path / "transactions.csv").write_text("ID,TimeStamp,Category,Amount,Type\n", encoding="utf-8")
+    (tmp_path / "transactions.csv").write_text("ID,TimeStamp,Title,Category,Amount,Type\n", encoding="utf-8")
 
     manager = FinanceManager(str(tmp_path))
     with pytest.raises(NotFoundError):
-        manager.add_transaction(type_id=TYPE_INCOME, category_id=1, amount="10.00")
+        manager.add_transaction(type_id=TYPE_INCOME, category_id=1, amount="10.00", title="Payroll Deposit")
 
 
 def test_erase_transactions_backs_up_and_clears(finance_manager, tmp_path):
@@ -121,3 +155,17 @@ def test_parse_date_range_rejects_start_after_end(finance_manager):
 def test_parse_date_range_rejects_malformed_date(finance_manager):
     with pytest.raises(ValidationError):
         finance_manager.parse_date_range("not-a-date", "2026-01-01")
+
+
+def test_parse_date_range_allows_future_end_date(finance_manager):
+    # Dashboard custom ranges may legitimately cover "this month" even if
+    # part of it hasn't happened yet, so future dates are allowed here.
+    future = (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d")
+    start, end = finance_manager.parse_date_range("2026-01-01", future)
+    assert start < end
+
+
+def test_combine_date_time_rejects_future_date(finance_manager):
+    future = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+    with pytest.raises(ValidationError):
+        finance_manager.combine_date_time(future, "10:00:00")

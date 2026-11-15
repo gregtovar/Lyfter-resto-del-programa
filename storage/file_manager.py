@@ -31,11 +31,21 @@ import tempfile
 
 from core.category import Category
 from core.transaction import Transaction
-from core.exceptions import FileOperationError
+from core.validators import Validator
+from core.exceptions import FileOperationError, ValidationError
 
 CATEGORY_FIELDS = ["ID", "Category"]
 TYPE_FIELDS = ["ID", "Type"]
-TRANSACTION_FIELDS = ["ID", "TimeStamp", "Category", "Amount", "Type"]
+TRANSACTION_FIELDS = ["ID", "TimeStamp", "Title", "Category", "Amount", "Type"]
+
+# Seeded the first time the app runs against a data directory that has no
+# types.csv yet. IDs match the TYPE_INCOME/TYPE_EXPENSE/TYPE_ADJUSTMENT
+# constants in core/validators.py, which the sign-rule logic depends on.
+DEFAULT_TYPES = [
+    {"id": 1, "name": "Income"},
+    {"id": 2, "name": "Expense"},
+    {"id": 3, "name": "Adjustment"},
+]
 
 
 
@@ -50,17 +60,27 @@ class FileManager:
         self.transactions_path = os.path.join(data_dir, "transactions.csv")
         self.transactions_backup_path = os.path.join(data_dir, "transaction_backup.csv")
 
+        # First run (or the data/ folder was deleted): create an empty directory
+        # so later saves can write their files without a missing-folder error.
+        try:
+            os.makedirs(data_dir, exist_ok=True)
+        except OSError as error:
+            raise FileOperationError(f"Could not create data directory {data_dir}: {error}")
+
     # ------------------------------------------------------------------ #
     # Generic helpers
     # ------------------------------------------------------------------ #
 
 
     # Read a CSV file and return a list of row dicts, skipping malformed rows.
-    
+    # A missing file is treated as "no data yet" rather than an error, so a
+    # fresh/empty data directory starts the app with empty lists instead of
+    # crashing.
+
     @staticmethod
     def _read_csv(path: str, required_fields: list) -> list:
         if not os.path.exists(path):
-            raise FileOperationError(f"Required data file is missing: {path}")
+            return []
 
         rows = []
         try:
@@ -126,7 +146,16 @@ class FileManager:
     # ------------------------------------------------------------------ #
 
     def load_types(self) -> list:
-        """Return all transaction types as a list of (id, name) dicts."""
+        """
+        Return all transaction types as a list of (id, name) dicts.
+
+        If types.csv does not exist yet (first run / fresh data directory),
+        seed the default Income/Expense/Adjustment types instead of starting
+        with an empty list, since sign-rule logic depends on them existing.
+        """
+        if not os.path.exists(self.types_path):
+            return [dict(t) for t in DEFAULT_TYPES]
+
         rows = self._read_csv(self.types_path, TYPE_FIELDS)
         return [{"id": int(row["ID"]), "name": row["Type"]} for row in rows]
 
@@ -144,9 +173,69 @@ class FileManager:
         return self.load_transactions_from(self.transactions_path)
 
     def load_transactions_from(self, path: str) -> list:
-        """Return all transactions found in an arbitrary CSV file as Transaction objects."""
+        """
+        Return all transactions found in an arbitrary CSV file as Transaction
+        objects.
+
+        Every row is validated as it is parsed: the ID must be a unique whole
+        number, Category/Type must be whole numbers, the timestamp must match
+        "YYYY-MM-DD HH:MM:SS", and the amount must be a finite number. Any
+        violation raises FileOperationError with the offending row number, so
+        a malformed or hand-edited CSV is rejected with a clear message
+        instead of crashing deep inside Transaction/Decimal parsing.
+        """
         rows = self._read_csv(path, TRANSACTION_FIELDS)
-        return [Transaction.from_row(row) for row in rows]
+
+        transactions = []
+        seen_ids = set()
+        for line_number, row in enumerate(rows, start=2):
+            try:
+                transaction_id = int(row["ID"])
+            except (TypeError, ValueError):
+                raise FileOperationError(
+                    f"Row {line_number} in {path}: invalid transaction ID '{row['ID']}'."
+                )
+
+            if transaction_id in seen_ids:
+                raise FileOperationError(
+                    f"Row {line_number} in {path}: duplicate transaction ID {transaction_id}."
+                )
+            seen_ids.add(transaction_id)
+
+            try:
+                category_id = int(row["Category"])
+            except (TypeError, ValueError):
+                raise FileOperationError(
+                    f"Row {line_number} in {path}: invalid category ID '{row['Category']}'."
+                )
+
+            try:
+                type_id = int(row["Type"])
+            except (TypeError, ValueError):
+                raise FileOperationError(
+                    f"Row {line_number} in {path}: invalid type ID '{row['Type']}'."
+                )
+
+            try:
+                timestamp = Validator.validate_timestamp(row["TimeStamp"])
+            except ValidationError as error:
+                raise FileOperationError(f"Row {line_number} in {path}: {error}")
+
+            try:
+                amount = Validator.validate_amount(row["Amount"])
+            except ValidationError as error:
+                raise FileOperationError(f"Row {line_number} in {path}: {error}")
+
+            transactions.append(Transaction(
+                transaction_id=transaction_id,
+                timestamp=timestamp,
+                title=row["Title"],
+                category_id=category_id,
+                amount=amount,
+                type_id=type_id,
+            ))
+
+        return transactions
 
     def save_transactions(self, transactions: list) -> None:
         """Persist the full list of Transaction objects, overwriting the file."""

@@ -58,6 +58,6 @@ def test_new_type_follows_adjustment_style_sign_rules(finance_manager):
     """Custom types (not Income/Expense) keep whatever sign the user enters."""
     custom_type = finance_manager.add_type("Refund")
     transaction = finance_manager.add_transaction(
-        type_id=custom_type["id"], category_id=1, amount="-15.00"
+        type_id=custom_type["id"], category_id=1, amount="-15.00", title="Manual Refund Adjustment"
     )
     assert str(transaction.amount) == "-15.00"

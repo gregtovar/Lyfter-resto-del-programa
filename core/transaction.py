@@ -27,10 +27,11 @@ from decimal import Decimal
 class Transaction:
     """Represents a single financial transaction."""
 
-    def __init__(self, transaction_id: int, timestamp: str, category_id: int,
+    def __init__(self, transaction_id: int, timestamp: str, title: str, category_id: int,
                  amount: Decimal, type_id: int):
         self.transaction_id = int(transaction_id)
         self.timestamp = timestamp
+        self.title = str(title)
         self.category_id = int(category_id)
         self.amount = Decimal(amount).quantize(Decimal("0.01"))
         self.type_id = int(type_id)
@@ -40,6 +41,7 @@ class Transaction:
         return {
             "ID": self.transaction_id,
             "TimeStamp": self.timestamp,
+            "Title": self.title,
             "Category": self.category_id,
             "Amount": f"{self.amount:.2f}",
             "Type": self.type_id,
@@ -51,6 +53,7 @@ class Transaction:
         return cls(
             transaction_id=row["ID"],
             timestamp=row["TimeStamp"],
+            title=row["Title"],
             category_id=row["Category"],
             amount=row["Amount"],
             type_id=row["Type"],
@@ -58,4 +61,5 @@ class Transaction:
 
     def __repr__(self) -> str:
         return (f"Transaction(id={self.transaction_id}, timestamp={self.timestamp!r}, "
-                f"category={self.category_id}, amount={self.amount}, type={self.type_id})")
+                f"title={self.title!r}, category={self.category_id}, "
+                f"amount={self.amount}, type={self.type_id})")
